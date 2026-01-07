@@ -68,6 +68,43 @@ final class PhotoManager {
         return assets
     }
 
+    // MARK: Fetching (Random Photos)
+
+    /// Random images across the whole library.
+    /// Note: This returns random assets by randomly sampling indices from PHFetchResult.
+    func fetchRandomPhotos(limit: Int = 250) -> [PHAsset] {
+        let options = PHFetchOptions()
+        options.predicate = NSPredicate(format: "mediaType == %d", PHAssetMediaType.image.rawValue)
+        // No sort needed for randomness.
+
+        let result = PHAsset.fetchAssets(with: options)
+        let total = result.count
+        guard total > 0 else { return [] }
+
+        let count = min(limit, total)
+        if count == total {
+            var all: [PHAsset] = []
+            all.reserveCapacity(total)
+            result.enumerateObjects { asset, _, _ in all.append(asset) }
+            all.shuffle()
+            return all
+        }
+
+        var chosen = Set<Int>()
+        chosen.reserveCapacity(count)
+        while chosen.count < count {
+            chosen.insert(Int.random(in: 0..<total))
+        }
+
+        var assets: [PHAsset] = []
+        assets.reserveCapacity(count)
+        for idx in chosen {
+            assets.append(result.object(at: idx))
+        }
+        assets.shuffle()
+        return assets
+    }
+
     // MARK: Thumbnails
 
     func requestThumbnail(

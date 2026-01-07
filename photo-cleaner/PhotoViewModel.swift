@@ -47,8 +47,11 @@ final class PhotoViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
 
-        // Screenshots only (initial MVP scope).
-        assets = manager.fetchScreenshots(limit: 300)
+        // was: screenshots only
+        // assets = manager.fetchScreenshots(limit: 300)
+
+        // now: random photos from the whole library
+        assets = manager.fetchRandomPhotos(limit: 300)
         currentIndex = 0
     }
 
