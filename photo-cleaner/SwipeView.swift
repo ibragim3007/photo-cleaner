@@ -10,6 +10,9 @@ struct SwipeView: View {
 
     var body: some View {
         GeometryReader { geo in
+            let cardWidth = geo.size.width
+            let cardHeight = min(geo.size.height, cardWidth * 1.35) // responsive height
+
             ZStack {
                 if viewModel.hasMoreCards {
                     // Next card preview
@@ -21,6 +24,7 @@ struct SwipeView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
+                            .frame(width: cardWidth, height: cardHeight) // <-- constrain
                             .scaleEffect(0.97)
                             .offset(y: 10)
 
@@ -31,13 +35,14 @@ struct SwipeView: View {
                     // Top card
                     if let asset = currentAsset {
                         CardView(asset: asset, image: topImage, dragOffset: dragOffset)
+                            .frame(width: cardWidth, height: cardHeight) // <-- constrain
                             .offset(dragOffset)
                             .rotationEffect(.degrees(Double(dragOffset.width / 18)))
-                            .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 10)
+//                            .shadow(color: .black.opacity(0.18), radius: 18, x: 0, y: 10)
                             .gesture(dragGesture(for: asset, in: geo.size))
                             .task(id: asset.localIdentifier) {
                                 topImage = nil
-                                let px = min(1200, max(600, geo.size.width * UIScreen.main.scale))
+                                let px = min(1400, max(800, cardWidth * UIScreen.main.scale))
                                 let target = CGSize(width: px, height: px)
                                 topImage = await viewModel.thumbnail(for: asset, targetSize: target)
                             }
@@ -55,8 +60,9 @@ struct SwipeView: View {
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(height: 520)
+        // .frame(height: 520)  <-- remove fixed height
     }
 
     private var currentAsset: PHAsset? {

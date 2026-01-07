@@ -24,6 +24,14 @@ enum PhotoAuthorizationState: Equatable {
 final class PhotoManager {
     static let shared = PhotoManager()
 
+    // Preview mocks (internet URLs)
+    static let previewMockImageURLs: [URL] = [
+        URL(string: "https://i.postimg.cc/QxqdyP0n/Chat-GPT-Image-17-2025-10-52-28.png")!,
+        URL(string: "https://i.postimg.cc/sDDbQjnS/IMG-4148-2.jpg")!,
+        URL(string: "https://i.postimg.cc/MTCsW9Mm/Chat-GPT-Image-10-2025-14-53-31.png")!,
+        URL(string: "https://i.postimg.cc/8kLM0GJJ/Chat-GPT-Image-10-2025-19-27-37.png")!
+    ]
+
     private let imageManager = PHCachingImageManager()
     private init() {}
 
@@ -65,7 +73,7 @@ final class PhotoManager {
     func requestThumbnail(
         for asset: PHAsset,
         targetSize: CGSize,
-        contentMode: PHImageContentMode = .aspectFill
+        contentMode: PHImageContentMode = .aspectFit // <-- was .aspectFill
     ) async -> UIImage? {
         await withCheckedContinuation { continuation in
             let options = PHImageRequestOptions()
@@ -160,6 +168,16 @@ final class PhotoManager {
                     continuation.resume(throwing: err)
                 }
             })
+        }
+    }
+
+    // MARK: Preview helpers (not used by PhotoKit flow)
+    func fetchRemotePreviewImage(from url: URL) async -> UIImage? {
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+            return UIImage(data: data)
+        } catch {
+            return nil
         }
     }
 }

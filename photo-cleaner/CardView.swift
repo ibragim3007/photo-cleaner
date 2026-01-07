@@ -10,12 +10,14 @@ struct CardView: View {
     var body: some View {
         ZStack(alignment: .top) {
             Rectangle()
-                .fill(Color.secondary.opacity(0.15))
+                .fill(Color.black.opacity(0.92)) // <-- better for aspectFit letterboxing
 
             if let image {
                 Image(uiImage: image)
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit() // <-- was scaledToFill (cropped / could look "wrong")
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .clipped()
             } else {
                 ProgressView()
             }
