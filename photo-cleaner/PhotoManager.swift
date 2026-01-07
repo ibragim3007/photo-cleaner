@@ -131,6 +131,11 @@ final class PhotoManager {
         }
     }
 
+    // Convenience for grids (fills the cell nicely)
+    func requestGridThumbnail(for asset: PHAsset, targetSize: CGSize) async -> UIImage? {
+        await requestThumbnail(for: asset, targetSize: targetSize, contentMode: .aspectFill)
+    }
+
     // MARK: Size (for "Space to be freed")
 
     func estimatedFileSizeBytes(for asset: PHAsset) -> Int64 {
@@ -170,7 +175,7 @@ final class PhotoManager {
             })
         }
     }
-
+  
     // MARK: Preview helpers (not used by PhotoKit flow)
     func fetchRemotePreviewImage(from url: URL) async -> UIImage? {
         do {
@@ -179,5 +184,15 @@ final class PhotoManager {
         } catch {
             return nil
         }
+    }
+
+    /// Utility: targetSize (px) for a 3-column square grid cell.
+    func gridTargetSizePx(containerWidthPoints: CGFloat, horizontalPaddingPoints: CGFloat = 16, spacingPoints: CGFloat = 10) -> CGSize {
+        let columns: CGFloat = 3
+        let totalSpacing = spacingPoints * (columns - 1)
+        let available = max(0, containerWidthPoints - (horizontalPaddingPoints * 2) - totalSpacing)
+        let cellPoints = floor(available / columns)
+        let px = cellPoints * UIScreen.main.scale
+        return CGSize(width: px, height: px)
     }
 }

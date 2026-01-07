@@ -56,6 +56,14 @@ final class PhotoViewModel: ObservableObject {
         await manager.requestThumbnail(for: asset, targetSize: targetSize)
     }
 
+    func thumbnail(
+        for asset: PHAsset,
+        targetSize: CGSize,
+        contentMode: PHImageContentMode = .aspectFit
+    ) async -> UIImage? {
+        await manager.requestThumbnail(for: asset, targetSize: targetSize, contentMode: contentMode)
+    }
+
     func swipeLeftDelete(_ asset: PHAsset) {
         guard !deletionQueue.contains(where: { $0.localIdentifier == asset.localIdentifier }) else {
             advance()
@@ -98,5 +106,12 @@ final class PhotoViewModel: ObservableObject {
     func openSettings() {
         guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
         UIApplication.shared.open(url)
+    }
+
+    func unqueueFromDeletion(_ asset: PHAsset) {
+        guard let idx = deletionQueue.firstIndex(where: { $0.localIdentifier == asset.localIdentifier }) else { return }
+        deletionQueue.remove(at: idx)
+        // MVP: recalc for this asset on removal (good enough for now)
+        deletionQueueBytes = max(0, deletionQueueBytes - manager.estimatedFileSizeBytes(for: asset))
     }
 }

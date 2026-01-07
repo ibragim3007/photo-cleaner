@@ -38,13 +38,8 @@ struct ContentView: View {
                                         .font(.title3.weight(.semibold))
                                 }
                                 Spacer()
-                                Button {
-                                    Task { await viewModel.cleanTrash() }
-                                } label: {
-                                    Label("Clean Trash", systemImage: "trash")
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .disabled(viewModel.deletionQueue.isEmpty || viewModel.isCleaning)
+                                // MARK: - Updated Trailing Controls
+                                headerTrailingControls
                             }
                             .padding(.horizontal)
 
@@ -60,6 +55,27 @@ struct ContentView: View {
                 guard !isRunningInPreviews else { return }
                 await viewModel.onAppear()
             }
+        }
+    }
+
+    // MARK: - Updated Trailing Controls
+    private var headerTrailingControls: some View {
+        HStack(spacing: 10) {
+            NavigationLink {
+                DeletionQueueView(viewModel: viewModel)
+            } label: {
+                Label("Review", systemImage: "photo.on.rectangle.angled")
+            }
+            .buttonStyle(.bordered)
+            .disabled(viewModel.deletionQueue.isEmpty)
+
+//            Button {
+//                Task { await viewModel.cleanTrash() }
+//            } label: {
+//                Label("Clean Trash", systemImage: "trash")
+//            }
+//            .buttonStyle(.borderedProminent)
+//            .disabled(viewModel.deletionQueue.isEmpty || viewModel.isCleaning)
         }
     }
 }
